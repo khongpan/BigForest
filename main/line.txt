@@ -1,0 +1,43 @@
+
+
+#define WEB_SERVER "agritronics.nstda.or.th"
+#define WEB_PORT 80
+
+#define LINE_TOKEN "7tLI9wSY4uPrizyKktnkSXQHZJi4XKuBFA3bNOWqNmN
+
+
+
+
+void Line_Notify(String message) {
+  WiFiClientSecure client;
+
+  if (!client.connect("notify-api.line.me", 443)) {
+    Serial.println("connection failed");
+    return;   
+  }
+
+  String req = "";
+  req += "POST /api/notify HTTP/1.1\r\n";
+  req += "Host: notify-api.line.me\r\n";
+  req += "Authorization: Bearer " + String(LINE_TOKEN) + "\r\n";
+  req += "Cache-Control: no-cache\r\n";
+  req += "User-Agent: ESP8266\r\n";
+  req += "Content-Type: application/x-www-form-urlencoded\r\n";
+  req += "Content-Length: " + String(String("message=" + message).length()) + "\r\n";
+  req += "\r\n";
+  req += "message=" + message;
+  // Serial.println(req);
+  client.print(req);
+    
+  delay(20);
+
+  // Serial.println("-------------");
+  while(client.connected()) {
+    String line = client.readStringUntil('\n');
+    if (line == "\r") {
+      break;
+    }
+    //Serial.println(line);
+  }
+  // Serial.println("-------------");
+}
